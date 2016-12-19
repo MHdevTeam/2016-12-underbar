@@ -196,7 +196,6 @@
    * OBJECTS
    * =======
    *
-   * In this section, we'll look at a couple of helpers for merging objects.
    */
 
   // Extend a given object with all the properties of the passed in
@@ -207,13 +206,25 @@
   //   _.extend(obj1, { //     key2: "something new",  //     key3: "something else new" //   }, {//  bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
-    
+    var temp =arguments[0];
+    _.each(Array.prototype.slice.call(arguments, 1), function(value){
+       _.each(value, function(value1, key1){temp[key1] = value[key1];});
+    });
+    return temp; 
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
-    
+    var temp =arguments[0];
+    _.each(Array.prototype.slice.call(arguments, 1), function(value){
+       _.each(value, function(value1, key1){
+        if(temp[key1] === undefined) {
+         temp[key1] =value[key1];
+       }
+     });
+    });
+    return temp; 
   };
 
 
@@ -257,12 +268,15 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
-    var obj=[];
-    var result;
-    if(obj === undefined ){
-      obj.push(func.apply(this, arguments));
+    var obj={}; 
+    
+    return function(){
+    var temp= JSON.stringify(arguments);
+      if(obj[temp] === undefined)
+         obj[temp] =  func.apply(this,arguments);
+      return obj[temp];
+
     }
-    return obj[0];
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -272,6 +286,9 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    if(arguments.length > 2)
+      setTimeout(func.apply(this,Array.prototype.slice.call(arguments, 2)), wait);
+    setTimeout(func, wait);  
   };
 
 
@@ -286,6 +303,12 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var temp= array.slice(0);
+    _.each(array, function(value, index){
+      temp[index] = array.slice(index, 1,Math.floor(Math.random() * array.length)+ index);
+      
+    })
+    return temp;
   };
 
 
